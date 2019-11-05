@@ -67,8 +67,10 @@ crossing (R (P (x1:y1:z1)) (P (x2:_))) (R (P (x3:y3:z3)) _) =
 -- The 'intersection' function calculates the rectangle that is the intersection of two rectangles.
 -- If the intersection is empty, the resulting rectangle will be invalid.
 intersection :: Rectangle -> Rectangle -> Rectangle
-intersection (R p1 p2) (R p3 p4) = 
-    R (maxP p1 p3) (minP p2 p4)
+intersection (R p1 p2) (R p3 p4) = undefined
+    -- R (maxP p1 p3) (minP p2 p4)
+    -- where p1p3 = maxP p1 p3
+    --       p2p4 = minP p2 p4
 
 -- The 'intersection' function calculates the mimum bound rectangle of two rectangles.
 minimumBoundRect :: Rectangle -> Rectangle -> Rectangle
