@@ -16,16 +16,20 @@ instance Arbitrary Rectangle where
         return $ R (minP p1 p2) (maxP p1 p2)
     
 
-prop_intersectionIsInBoundingBox r1 r2 = imbr_r2 == r2
+prop_intersectionIsInBoundingBox r1 r2 = 
+    case i of 
+        Just ri -> minimumBoundRect ri r2 == r2
+        Nothing -> True
     where 
         i = intersection r1 r2
-        imbr_r2 = minimumBoundRect i r2
 
 
-prop_areaIntersectionLessthan r1 r2 = areaR i <= areaR r1 && areaR i <= areaR r2
+prop_areaIntersectionLessthan r1 r2 = 
+    case mi of 
+        Just i -> areaR i <= areaR r1 && areaR i <= areaR r2
+        Nothing -> True
     where 
-        i = intersection r1 r2
-        imbr_r2 = minimumBoundRect i r2
+        mi = intersection r1 r2
     
 main :: IO ()
 main = do
