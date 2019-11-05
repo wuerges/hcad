@@ -11,10 +11,27 @@ instance Arbitrary Point where
 
 instance Arbitrary Rectangle where
     arbitrary = do
-        Point p1 <- arbitrary        
-        Point p2 <- arbitrary        
+        p1 <- arbitrary        
+        p2 <- arbitrary        
         return $ R (minP p1 p2) (maxP p1 p2)
     
 
+prop_intersectionIsInBoundingBox r1 r2 = imbr_r2 == r2
+    where 
+        i = intersection r1 r2
+        imbr_r2 = minimumBoundRect i r2
+
+
+prop_areaIntersectionLessthan r1 r2 = areaR i <= areaR r1 && areaR i <= areaR r2
+    where 
+        i = intersection r1 r2
+        imbr_r2 = minimumBoundRect i r2
+    
 main :: IO ()
-main = putStrLn "Test suite not yet implemented"
+main = do
+
+    putStrLn "\nTesting intersection bounding box:"
+    quickCheck prop_intersectionIsInBoundingBox
+
+    putStrLn "\nTesting intersection area"
+    quickCheck prop_areaIntersectionLessthan

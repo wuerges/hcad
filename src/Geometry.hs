@@ -1,6 +1,6 @@
 module Geometry 
-    ( Point
-    , Rectangle
+    ( Point (P)
+    , Rectangle (R)
     , distanceP
     , distanceR
     , areaR
@@ -67,8 +67,7 @@ crossing (R (P (x1:y1:z1)) (P (x2:_))) (R (P (x3:y3:z3)) _) =
 -- The 'intersection' function calculates the rectangle that is the intersection of two rectangles.
 -- If the intersection is empty, the resulting rectangle will be invalid.
 intersection :: Rectangle -> Rectangle -> Rectangle
-intersection (R p1 p2) (R p3 p4) = undefined
-    R (minP p1' p2') p2
+intersection (R p1 p2) (R p3 p4) = R (minP p1' p2') p2
     where p1' = maxP p1 p3
           p2' = minP p2 p4
 
