@@ -5,10 +5,10 @@ module RTree
 
 import Geometry
 
-data Node = Leaf Int [Rectangle]
+data Node a = Leaf [(Rectangle, a)] | Inter [(Rectangle, Node a)]
 
-data RTree = Node Int Node 
+data RTree a = Node (Node a)
 
 
-makeRTree :: RTree
+makeRTree :: RTree a
 makeRTree = undefined
