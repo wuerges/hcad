@@ -4,11 +4,38 @@ module RTree
     ) where
 
 import Geometry
+import Data.List (sortOn)
 
-data Node a = Leaf [(Rectangle, a)] | Inter [(Rectangle, Node a)]
+maximumSize = 8
+-- minimumSize = maximumSize `div` 2
+
+
+data Node a = Leaf [(Rectangle, a)] | Child [(Rectangle, Node a)]
+data BNode a = BNode Rectangle (Node a)
 
 data RTree a = Node (Node a)
 
 
-makeRTree :: RTree a
-makeRTree = undefined
+makeRTree :: Node a
+makeRTree = Leaf []
+
+
+-- insertLink (Leaf ) = 
+
+checkSplit :: Node a -> Node a
+checkSplit v = v
+
+
+insertNode :: Rectangle -> a -> Node a -> Node a
+insertNode r v (Leaf l) = checkSplit $ Leaf $ (r, v):l
+insertNode r v (Child l) = checkSplit $ Child $ (hr', hn'):hs
+    where 
+        (h : hs) = sortOn (\x -> mbr r (fst x)) l
+        mbr = minimumBoundRect
+        hr' :: Rectangle
+        hr' = mbr r (fst h)
+        hn' = insertNode r v (snd h)
+    
+
+-- insert r v (Node box l) = Node (minimumBoundRect r box) (r, v):
+--         where n = insertLink r v
