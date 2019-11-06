@@ -25,7 +25,16 @@ singleton = Leaf
 
 splitList :: [(Rectangle, a)] -> 
     Either [(Rectangle, a)] (Rectangle, [(Rectangle, a)], Rectangle, [(Rectangle, a)])
-splitList = undefined
+splitList l = 
+    if length l < maximumSize then Left l else Right $ work l
+    where
+        (left_h, right_h):rem = sortOn (\(x,y) -> -(areaR $ mbr x y)) [(a, b) | a <- map fst l, b <- map fst l]
+
+        work = foldl f (left_h, [], right_h, [])
+        f (rect_a, a, rect_b, b) (r, v) = 
+            if mbr r rect_a < mbr r rect_b 
+                then (mbr r rect_a, (r,v):a,       rect_b,       b)
+                else (      rect_a,       a, mbr r rect_b, (r,v):b)
 
 mbr = minimumBoundRect
 
