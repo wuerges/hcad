@@ -20,10 +20,17 @@ makeRTree :: Node a
 makeRTree = Leaf []
 
 
--- insertLink (Leaf ) = 
+splitList :: [(Rectangle, a)] -> ([(Rectagle, a)],[(Rectagle, a)])
+splitList = undefined
+
 
 checkSplit :: Node a -> Node a
-checkSplit v = v
+checkSplit (Leaf l) 
+    | length l < maximumSize = Leaf l
+    | otherwise              = Leaf $ splitList l
+checkSplit (Child l) 
+    | length l < maximumSize = Child l
+    | otherwise              = Child $ splitList l
 
 
 insertNode :: Rectangle -> a -> Node a -> Node a
