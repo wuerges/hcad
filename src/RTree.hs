@@ -20,7 +20,7 @@ makeRTree :: Node a
 makeRTree = Leaf []
 
 
-splitList :: [(Rectangle, a)] -> ([(Rectagle, a)],[(Rectagle, a)])
+splitList :: [(Rectangle, a)] -> ([(Rectangle, a)],[(Rectangle, a)])
 splitList = undefined
 
 
