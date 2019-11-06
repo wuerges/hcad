@@ -36,8 +36,6 @@ splitList l =
         (left_h_t):rem1 = sortOn (\x -> -(areaR $ mbr left_h (mbr' x))) l
         (right_h_t):rem2 = sortOn (\x -> -(areaR $ mbr left_h (mbr' x))) rem1
 
-        -- work :: (RTree a, RTree a)
-        -- work = foldl f (Child left_h [], Child right_h [])
         work = foldl f (Child left_h [left_h_t], Child right_h [right_h_t]) rem2
         
         f :: (RTree b, RTree b) -> RTree b -> (RTree b, RTree b)
