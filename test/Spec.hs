@@ -1,4 +1,5 @@
 import Geometry
+import RTree
 import Test.QuickCheck
 
 instance Arbitrary Point where
@@ -30,7 +31,13 @@ prop_areaIntersectionLessthan r1 r2 =
         Nothing -> True
     where 
         mi = intersection r1 r2
-    
+
+prop_rtree_lookup_ok rs = all (flip RTree.elem t) rs
+    where
+        t = foldr insert' empty $ zip rs (repeat 1)
+        insert' (k,v) = insert k v
+        
+
 main :: IO ()
 main = do
 
@@ -39,3 +46,6 @@ main = do
 
     putStrLn "\nTesting intersection area"
     quickCheck prop_areaIntersectionLessthan
+
+    putStrLn "\nTesting RTree insertion"
+    quickCheck prop_rtree_lookup_ok

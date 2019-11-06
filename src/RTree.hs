@@ -3,6 +3,7 @@ module RTree
     , singleton
     , insert
     , RTree
+    , RTree.elem
     ) where
 
 import Geometry
@@ -30,7 +31,10 @@ splitList l =
     where
         (left_h, right_h):rem = sortOn (\(x,y) -> -(areaR $ mbr x y)) [(a, b) | a <- map fst l, b <- map fst l]
 
+        work :: [(Rectangle, b)] -> (Rectangle, [(Rectangle, b)], Rectangle, [(Rectangle, b)])
         work = foldl f (left_h, [], right_h, [])
+        
+        f :: (Rectangle, [(Rectangle, b)], Rectangle, [(Rectangle, b)]) -> (Rectangle, b) -> (Rectangle, [(Rectangle, b)], Rectangle, [(Rectangle, b)])
         f (rect_a, a, rect_b, b) (r, v) = 
             if mbr r rect_a < mbr r rect_b 
                 then (mbr r rect_a, (r,v):a,       rect_b,       b)
@@ -72,3 +76,17 @@ insert r v t =
                 mbr_a = mbr' a
                 mbr_b = mbr' b
 
+
+
+elem :: Rectangle -> RTree a -> Bool
+elem _ Empty = False
+elem r (Leaf bb _) = 
+    case intersection r bb of
+        Nothing -> False
+        Just _ -> True 
+
+elem r (Child bb l) = 
+    case intersection r bb of
+        Nothing -> False
+        Just _ -> any (RTree.elem r) (map snd l)
+        
