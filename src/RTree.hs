@@ -29,12 +29,16 @@ singleton = Leaf
 splitList :: [RTree a] -> 
     Either [RTree a] (RTree a, RTree a)
 splitList l = 
-    if length l < maximumSize then Left l else Right $ work l
+    if length l < maximumSize then Left l else Right $ work
     where
-        (left_h, right_h):rem = sortOn (\(x,y) -> -(areaR $ mbr x y)) [(a, b) | a <- map mbr' l, b <- map mbr' l]
+        (left_h, right_h):_ = sortOn (\(x,y) -> -(areaR $ mbr x y)) [(a, b) | a <- map mbr' l, b <- map mbr' l]
 
-        work :: [RTree b] -> (RTree b, RTree b)
-        work = foldl f (Child left_h [], Child right_h [])
+        (left_h_t):rem1 = sortOn (\x -> -(areaR $ mbr left_h (mbr' x))) l
+        (right_h_t):rem2 = sortOn (\x -> -(areaR $ mbr left_h (mbr' x))) rem1
+
+        -- work :: (RTree a, RTree a)
+        -- work = foldl f (Child left_h [], Child right_h [])
+        work = foldl f (Child left_h [left_h_t], Child right_h [right_h_t]) rem2
         
         f :: (RTree b, RTree b) -> RTree b -> (RTree b, RTree b)
         f (a@(Child ra ca), b@(Child rb cb)) t = 
