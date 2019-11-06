@@ -21,7 +21,9 @@ makeRTree :: Node a
 makeRTree = Empty
 
 
-splitList :: [(Rectangle, a)] -> ([(Rectangle, a)],[(Rectangle, a)])
+-- splitList :: [(Rectangle, a)] -> ([(Rectangle, a)],[(Rectangle, a)])
+splitList :: [(Rectangle, a)] -> 
+    Either [(Rectangle, a)] (Rectangle, [(Rectangle, a)], Rectangle, [(Rectangle, a)])
 splitList = undefined
 
 mbr = minimumBoundRect
@@ -48,48 +50,21 @@ insertNode :: Rectangle -> a -> Node a -> Either (Node a) (Node a, Node a)
 insertNode r v Empty = Left $ Leaf r [(r,v)]
 
 insertNode r v (Leaf bb l) = 
-    if length l' < maximumSize 
-        then Left $ Leaf (mbr bb r) ((r,v):l)
-        else Right $ ((Leaf (mbr1 $ map fst a) a), (Leaf (mbr1 $ map fst b) b))
+    case splitList l' of
+        Left single -> Left $ Leaf (mbr bb r) single
+        Right (mbr_a, a, mbr_b, b) -> Right (Leaf mbr_a a, Leaf mbr_b b)
     where 
         l' = (r,v):l
-        (a, b) = splitList l'
+
 
 insertNode r v (Child bb l) =
-    if length l_ < maximumSize
-        then Left $ Child (mbr bb mbr_) l_
-        else Right (Child (mbr1 $ map fst a) a, Child (mbr1 $ map fst b) b)
+    case splitList l_ of
+        Left single -> Left $ Child (mbr bb mbr_) single
+        Right (mbr_a, a, mbr_b, b) -> Right (Child mbr_a a, Child mbr_b b)
     where 
         (rh, nh) : hs = sortOn (\x -> mbr r (fst x)) l
         (mbr_, l_) = case insertNode r v nh of
-            Left single -> (mbr' single, (mbr' single, single):hs)
+            Left no_split -> (mbr' no_split, (mbr' no_split, no_split):hs)
             Right (one, two) -> (mbr (mbr' one) (mbr' two), (mbr' one, one):(mbr' two, two):hs)
 
-        (a, b) = splitList l_
 
-
--- insertNode r v (Child l) = 
---     if length l > maximumSize
---         then (Child l', Nothing)
---         else (Child a, Just $ Child [(mbr_b, Child b)])
-
---     where
---         (rh, nh) : hs = sortOn (\x -> mbr r (fst x)) l
---         l' = case insertNode r v nh of
---                 (a, Nothing) -> ()
-
-
---         l' = (r, v):l
---         r = case checkSplit l of
---                 Left single -> Leaf
---     Leaf $ (r, v):l
--- insertNode r v (Child l) = Child $ checkSplit hr' hn' ++ hs
---     where 
---         (h : hs) = sortOn (\x -> mbr r (fst x)) l
---         hr' :: Rectangle
---         hr' = mbr r (fst h)
---         hn' = insertNode r v (snd h)
-    
-
--- insert r v (Node box l) = Node (minimumBoundRect r box) (r, v):
---         where n = insertLink r v
