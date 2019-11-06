@@ -1,5 +1,7 @@
 module RTree
-    ( makeRTree 
+    ( empty
+    , singleton
+    , insert
     , RTree
     ) where
 
@@ -14,8 +16,11 @@ maximumSize = 8
 data RTree a = Empty | Leaf Rectangle a | Child Rectangle [(Rectangle, RTree a)]
 
 
-makeRTree :: RTree a
-makeRTree = Empty
+empty :: RTree a
+empty = Empty
+
+singleton :: Rectangle -> a -> RTree a
+singleton = Leaf
 
 
 splitList :: [(Rectangle, a)] -> 
@@ -49,8 +54,8 @@ insertNodeP r v (Child bb l) =
             Right (one, two) -> (mbr (mbr' one) (mbr' two), (mbr' one, one):(mbr' two, two):hs)
 
 
-insertNode :: Rectangle -> a -> RTree a -> RTree a
-insertNode r v t = 
+insert :: Rectangle -> a -> RTree a -> RTree a
+insert r v t = 
     case insertNodeP r v t of
         Left single -> single
         Right (a, b) -> Child (mbr mbr_a mbr_b) [(mbr_a, a), (mbr_b, b)]
