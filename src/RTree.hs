@@ -42,14 +42,6 @@ splitList l =
             if mbr ra rt < mbr rb rt
                 then (Child (mbr ra rt) (t:ca), b)
                 else (a, Child (mbr rb rt) (t:cb))
-        -- f (a@(Child ra ca), b@(Child rb cb)) t@(Leaf rt ct) = 
-        --     if mbr ra rt < mbr rb rt
-        --         then (Child (mbr ra rt) (t:ca), b)
-        --         else (a, Child (mbr rb rt) (t:cb))
-        --         f (rect_a, a, rect_b, b) (r, v) = 
---             if mbr r rect_a < mbr r rect_b 
---                 then (mbr r rect_a, (r,v):a,       rect_b,       b)
---                 else (      rect_a,       a, mbr r rect_b, (r,v):b)
 
 mbr = minimumBoundRect
 
