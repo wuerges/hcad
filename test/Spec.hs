@@ -17,6 +17,14 @@ instance Arbitrary Rectangle where
         return $ R (minP p1 p2) (maxP p1 p2)
     
 
+newtype VoidRTree = VoidRTree (RTree ())
+
+instance Arbitrary VoidRTree where
+    arbitrary = do
+        rects <- arbitrary
+        return $ VoidRTree $ foldr (uncurry insert) empty $ zip rects (repeat ())
+
+
 prop_intersectionIsInBoundingBox r1 r2 = 
     case i of 
         Just ri -> minimumBoundRect ri r2 == r2
@@ -48,4 +56,4 @@ main = do
     quickCheck prop_areaIntersectionLessthan
 
     putStrLn "\nTesting RTree insertion"
-    quickCheck prop_rtree_lookup_ok
+    quickCheck $ withMaxSuccess 1000 prop_rtree_lookup_ok
