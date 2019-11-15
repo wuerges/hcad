@@ -2,7 +2,8 @@ module RTree
     ( empty
     , singleton
     , insert
-    , RTree
+    , RTree (Empty, Leaf, Child)
+    , RTree.elem
     ) where
 
 import Geometry
@@ -14,6 +15,7 @@ maximumSize = 8
 
 
 data RTree a = Empty | Leaf Rectangle a | Child Rectangle [RTree a]
+        deriving Show
 
 
 empty :: RTree a
@@ -54,6 +56,7 @@ mbr = minimumBoundRect
 mbr1 :: [RTree a] -> Rectangle
 mbr1 l = foldl1 mbr $ map mbr' l
 
+mbr' :: RTree a -> Rectangle
 mbr' Empty = error "empty has to mbr"
 mbr' (Leaf bb _) = bb
 mbr' (Child bb _) = bb
@@ -88,3 +91,16 @@ insert r v t =
         Left single -> single
         Right (a, b) -> Child (mbr' a `mbr` mbr' b) [a, b]
 
+
+elem :: Rectangle -> RTree a -> Bool
+elem _ Empty = False
+elem r (Leaf bb _) = 
+    case intersection r bb of
+        Nothing -> False
+        Just _ -> True 
+        
+elem r (Child bb l) = 
+    case intersection r bb of
+        Nothing -> False
+        Just _ -> any (RTree.elem r) l
+        
