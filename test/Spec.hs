@@ -53,7 +53,8 @@ treeHeight (Child _ (c:_)) = 1 + treeHeight c
 
 prop_level_rtree_equal Empty = True
 prop_level_rtree_equal (Leaf _ _) = True
-prop_level_rtree_equal (Child r (c:cs)) = all (treeHeight c ==) (map treeHeight cs)
+prop_level_rtree_equal (Child r (c:cs)) = 
+    all (treeHeight c ==) (map treeHeight cs) && all prop_level_rtree_equal (c:cs)
 
 prop_level_voidtree_equal (VoidRTree t) = prop_level_rtree_equal t
 
