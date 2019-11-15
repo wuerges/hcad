@@ -18,6 +18,7 @@ instance Arbitrary Rectangle where
     
 
 newtype VoidRTree = VoidRTree (RTree ())
+        deriving Show
 
 instance Arbitrary VoidRTree where
     arbitrary = do
@@ -46,6 +47,16 @@ prop_rtree_lookup_ok rs = all (flip RTree.elem t) rs
         insert' (k,v) = insert k v
         
 
+treeHeight Empty = 0
+treeHeight (Leaf _ _) = 1
+treeHeight (Child _ (c:_)) = 1 + treeHeight c
+
+prop_level_rtree_equal Empty = True
+prop_level_rtree_equal (Leaf _ _) = True
+prop_level_rtree_equal (Child r (c:cs)) = all (treeHeight c ==) (map treeHeight cs)
+
+prop_level_voidtree_equal (VoidRTree t) = prop_level_rtree_equal t
+
 main :: IO ()
 main = do
 
@@ -57,3 +68,6 @@ main = do
 
     putStrLn "\nTesting RTree insertion"
     quickCheck $ withMaxSuccess 1000 prop_rtree_lookup_ok
+
+    putStrLn "\nTesting RTree balance"
+    quickCheck $ withMaxSuccess 1000 prop_level_voidtree_equal
