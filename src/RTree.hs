@@ -43,13 +43,17 @@ select l1 l2 r1 r2 (l:ls) =
 
 -- splits a list of rtrees into two rtrees according to their mbrs
 splitNode :: [RTree a] -> (RTree a, RTree a)
-splitNode l = (Child (mbr1 rt1) rt1, Child (mbr1 rt2) rt2)
+splitNode l = (Child (mbr1 rt1') rt1', Child (mbr1 rt2') rt2')
     where
         (r1, r2):_ = sortOn leastArea (mbrs2 [] r ects)
         (r:ects) = map mbr' l
         leastArea :: (Rectangle, Rectangle) -> Int
         leastArea (a, b) = -(areaR $ mbr a b)
         (rt1, rt2) = select [] [] r1 r2 l
+        (rt1', rt2') = 
+            if length rt1 == 0 then ([head rt2], tail rt2)
+            else if length rt2 == 0 then (tail rt1, [head rt1])
+                 else (rt1, rt2)
         
 mbr = minimumBoundRect
 
