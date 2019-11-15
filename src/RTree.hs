@@ -23,30 +23,36 @@ singleton :: Rectangle -> a -> RTree a
 singleton = Leaf
 
 
+-- builds all pairs from combining every rectangle with another from the list
+mbrs2 :: [Rectangle] -> Rectangle -> [Rectangle] -> [(Rectangle, Rectangle)]
+mbrs2 pre r [] = zip (repeat r) pre
+mbrs2 pre r (p:ost) = 
+    zip (repeat r) pre ++
+    zip (repeat r) (p:ost) ++ 
+    mbrs2 (r:pre) p ost
 
+-- iterates trough a list of rtrees and splits them according to the smallest mbr
+select :: [RTree a] -> [RTree a] -> Rectangle -> Rectangle -> [RTree a] -> ([RTree a], [RTree a])
+select l1 l2 _ _ [] = (l1, l2)
+select l1 l2 r1 r2 (l:ls) = 
+    if mbr' l `mbr` r1 < mbr' l `mbr` r2 
+        then select (l:l1) l2 r1 r2 ls
+        else select l1 (l:l2) r1 r2 ls
 
+-- splits a list of rtrees into two rtrees according to their mbrs
 splitNode :: [RTree a] -> (RTree a, RTree a)
-splitNode l = undefined
-    -- if length l < maximumSize
-
--- splitList :: [(Rectangle, a)] -> 
---     Either [(Rectangle, a)] (Rectangle, [(Rectangle, a)], Rectangle, [(Rectangle, a)])
--- splitList l = 
---     if length l < maximumSize then Left l else Right $ work l
---     where
---         (left_h, right_h):rem = sortOn (\(x,y) -> -(areaR $ mbr x y)) [(a, b) | a <- map fst l, b <- map fst l]
-
---         work = foldl f (left_h, [], right_h, [])
---         f (rect_a, a, rect_b, b) (r, v) = 
---             if mbr r rect_a < mbr r rect_b 
---                 then (mbr r rect_a, (r,v):a,       rect_b,       b)
---                 else (      rect_a,       a, mbr r rect_b, (r,v):b)
-
+splitNode l = (Child (mbr1 rt1) rt1, Child (mbr1 rt2) rt2)
+    where
+        (r1, r2):_ = sortOn leastArea (mbrs2 [] r ects)
+        (r:ects) = map mbr' l
+        leastArea :: (Rectangle, Rectangle) -> Int
+        leastArea (a, b) = -(areaR $ mbr a b)
+        (rt1, rt2) = select [] [] r1 r2 l
+        
 mbr = minimumBoundRect
 
 mbr1 :: [RTree a] -> Rectangle
 mbr1 l = foldl1 mbr $ map mbr' l
-
 
 mbr' Empty = error "empty has to mbr"
 mbr' (Leaf bb _) = bb
