@@ -1,4 +1,4 @@
-module RTreeQ where
+module RTreeQ (make, deque) where
 
 import Geometry
 import RTree
@@ -21,6 +21,10 @@ push l (MBRSet bb s) = MBRSet bb (Map.insert area l s)
 
 pushMany :: [RTree a] -> MBRSet a -> MBRSet a
 pushMany ts s = foldl (flip push) s ts
+
+make :: Rectangle -> RTree a -> MBRSet a
+make r Empty = MBRSet r (Map.empty)
+make r x     = push x $ make r Empty
 
 deque :: StateT (MBRSet a) Maybe a
 deque = do
