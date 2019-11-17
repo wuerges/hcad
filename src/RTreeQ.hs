@@ -24,7 +24,7 @@ push l (MBRSet bb s) = MBRSet bb (Map.insert area l s)
         area = areaR $ mbr' l `minimumBoundRect` bb
 
 
-deque :: StateT [RTree a] Maybe a
+deque :: StateT (MBRSet a) Maybe a
 deque = do
     s <- get
     case s of
