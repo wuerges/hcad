@@ -4,6 +4,7 @@ module RTree
     , insert
     , RTree (Empty, Leaf, Child)
     , RTree.elem
+    , mbr'
     ) where
 
 import Geometry
@@ -108,3 +109,5 @@ elem r (Child bb l) =
         Nothing -> False
         Just _ -> any (RTree.elem r) l
         
+
+
