@@ -24,6 +24,7 @@ dependencies:
 - QuickCheck
 - mtl
 - containers
+- transformers
 
 library:
   source-dirs: src

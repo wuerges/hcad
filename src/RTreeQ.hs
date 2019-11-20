@@ -1,8 +1,10 @@
-module RTreeQ (make, deque) where
+-- module RTreeQ (make, deque, dequeAll) where
+module RTreeQ where
 
 import Geometry
 import RTree
 import Control.Monad.State.Lazy
+import Control.Monad.Trans.Maybe
 import IntMultimap (IntMultimap)
 import qualified IntMultimap as IM
 
@@ -26,17 +28,28 @@ make :: Rectangle -> RTree a -> MBRSet a
 make r Empty = MBRSet r (IM.empty)
 make r x     = push x $ make r Empty
 
-deque :: StateT (MBRSet a) Maybe a
+deque :: MaybeT (State (MBRSet a)) a
 deque = do
-    x <- get
-    (h, s') <- lift $ pop x
+    (h, s') <- MaybeT $ pop <$> get
     case h of
         Empty -> do
             put s'
             deque
         Leaf _ v -> do
             put s'
-            lift $ Just v
+            MaybeT $ return $ Just v
         Child _ ts -> do
             put $ pushMany ts s'
             deque
+            
+
+dequeAllM :: State (MBRSet a) [a]
+dequeAllM = do
+    x <- runMaybeT deque
+    case x of
+        Nothing -> return []
+        Just h -> (h:) <$> dequeAllM
+
+
+dequeAll :: Rectangle -> RTree a -> [a]
+dequeAll center tree = evalState dequeAllM $ make center tree

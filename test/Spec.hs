@@ -1,5 +1,6 @@
 import Geometry
 import RTree
+import RTreeQ
 import Test.QuickCheck
 
 instance Arbitrary Point where
@@ -57,6 +58,17 @@ prop_level_rtree_equal (Child r (c:cs)) =
     all (treeHeight c ==) (map treeHeight cs) && all prop_level_rtree_equal (c:cs)
 
 prop_level_voidtree_equal (VoidRTree t) = prop_level_rtree_equal t
+
+
+
+prop_rtree_queue_ordered :: Rectangle -> [Rectangle] -> Bool
+prop_rtree_queue_ordered center rects = True
+    where 
+        tree = foldr (uncurry insert) empty $ zip rects (repeat ())
+        queue = make center tree
+
+          
+          
 
 main :: IO ()
 main = do
