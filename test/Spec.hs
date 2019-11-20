@@ -2,6 +2,7 @@ import Geometry
 import RTree
 import RTreeQ
 import Test.QuickCheck
+import Data.List (sortOn, sort)
 
 instance Arbitrary Point where
     arbitrary = do
@@ -62,16 +63,42 @@ prop_level_voidtree_equal (VoidRTree t) = prop_level_rtree_equal t
 
 
 prop_rtree_queue_ordered :: Rectangle -> [Rectangle] -> Bool
-prop_rtree_queue_ordered center rects = True
+prop_rtree_queue_ordered center rects = all (\(r1, r2) -> distanceR center r1 == distanceR center r2) $ zip ordered1 ordered2
     where 
-        tree = foldr (uncurry insert) empty $ zip rects (repeat ())
-        queue = make center tree
+        tree = foldr (uncurry insert) empty $ zip rects rects
+        ordered1 = dequeAll center tree
+        ordered2 = sortOn (\r -> distanceR center r) rects
 
+
+prop_rtree_queue_length :: Rectangle -> [Rectangle] -> Bool
+prop_rtree_queue_length center rects = length ordered1 == length ordered2
+    where 
+        tree = foldr (uncurry insert) empty $ zip rects rects
+        ordered1 = dequeAll center tree
+        ordered2 = sortOn (\r -> distanceR center r) rects
+
+prop_rtree_queue_elems :: Rectangle -> [Rectangle] -> Bool
+prop_rtree_queue_elems center rects = ordered1 == ordered2
+    where 
+        tree = foldr (uncurry insert) empty $ zip rects rects
+        ordered1 = sort $ dequeAll center tree
+        ordered2 = sort rects
+        
+                        
           
           
 
 main :: IO ()
 main = do
+
+    putStrLn "\nTesting ordering of rtree queue"
+    quickCheck $ withMaxSuccess 1000 prop_rtree_queue_ordered
+
+    putStrLn "\nTesting length of rtree queue"
+    quickCheck prop_rtree_queue_length
+
+    putStrLn "\nTesting elements of rtree queue"
+    quickCheck prop_rtree_queue_elems
 
     putStrLn "\nTesting intersection bounding box:"
     quickCheck prop_intersectionIsInBoundingBox

@@ -19,7 +19,7 @@ push :: RTree a -> MBRSet a -> MBRSet a
 push Empty x = x
 push l (MBRSet bb s) = MBRSet bb (IM.insert area l s)
     where
-        area = areaR $ mbr' l `minimumBoundRect` bb
+        area = mbr' l `distanceR` bb
 
 pushMany :: [RTree a] -> MBRSet a -> MBRSet a
 pushMany ts s = foldl (flip push) s ts
