@@ -1,6 +1,8 @@
 import Geometry
 import RTree
 import Test.QuickCheck
+import Control.Monad.ST
+import MUF
 
 instance Arbitrary Point where
     arbitrary = do
@@ -72,3 +74,12 @@ main = do
 
     putStrLn "\nTesting RTree balance"
     quickCheck $ withMaxSuccess 1000 prop_level_voidtree_equal
+
+    putStrLn "\nTesting MUF"
+    print $ runST $ do
+        muf <- make 10
+        union muf 1 2
+        union muf 1 3
+        union muf 5 6
+        union muf 3 6
+        mapM (find muf) [1..10]
