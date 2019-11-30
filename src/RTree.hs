@@ -2,6 +2,7 @@ module RTree
     ( empty
     , singleton
     , insert
+    , fromList
     , RTree (Empty, Leaf, Child)
     , RTree.elem
     , mbr'
@@ -18,6 +19,9 @@ maximumSize = 8
 data RTree a = Empty | Leaf Rectangle a | Child Rectangle [RTree a]
         deriving Show
 
+
+fromList :: [(Rectangle, a)] -> RTree a
+fromList = foldl (flip $ uncurry insert) Empty
 
 empty :: RTree a
 empty = Empty
