@@ -24,10 +24,15 @@ instance Arbitrary Rectangle where
 newtype VoidRTree = VoidRTree (RTree ())
         deriving Show
 
+instance Arbitrary a => Arbitrary (RTree a) where
+    arbitrary = do
+        values <- arbitrary :: Arbitrary a => Gen [(Rectangle, a)]
+        return $ foldr (uncurry insert) empty values 
+
 instance Arbitrary VoidRTree where
     arbitrary = do
-        rects <- arbitrary
-        return $ VoidRTree $ foldr (uncurry insert) empty $ zip rects (repeat ())
+        tree <- arbitrary
+        return $ VoidRTree $ tree
 
 
 prop_intersectionIsInBoundingBox r1 r2 = 
@@ -87,8 +92,12 @@ prop_rtree_queue_elems center rects = ordered1 == ordered2
         ordered2 = sort rects
         
                         
-          
-          
+prop_rtree_balanced :: RTree () -> Bool
+prop_rtree_balanced tree = mse1 tree <= 15.0
+  
+prop_rtree_balanced_height :: RTree () -> Bool
+prop_rtree_balanced_height tree = treeHeight tree <= 2 || (logBase 2 (fromIntegral $ count tree) >= (fromIntegral $ treeHeight tree))
+  
 
 main :: IO ()
 main = do
@@ -113,6 +122,13 @@ main = do
 
     putStrLn "\nTesting RTree balance"
     quickCheck $ withMaxSuccess 1000 prop_level_voidtree_equal
+
+    -- putStrLn "\nTesting RTree balance mse"
+    -- quickCheck $ withMaxSuccess 100000 prop_rtree_balanced
+
+    putStrLn "\nTesting RTree balance log"
+    quickCheck $ withMaxSuccess 1000 prop_rtree_balanced_height
+    
 
     putStrLn "\nTesting MUF"
     print $ runST $ do

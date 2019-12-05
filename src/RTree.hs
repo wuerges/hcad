@@ -6,6 +6,8 @@ module RTree
     , RTree (Empty, Leaf, Child)
     , RTree.elem
     , mbr'
+    , mse1
+    , count
     ) where
 
 import Geometry
@@ -17,8 +19,11 @@ maximumSize = 8
 
 
 data RTree a = Empty | Leaf Rectangle a | Child Rectangle [RTree a]
-        deriving Show
+        -- deriving Show
 
+instance Show a => Show (RTree a) where
+    -- show :: Show a => RTree a -> String
+    show = draw 0
 
 fromList :: [(Rectangle, a)] -> RTree a
 fromList = foldl (flip $ uncurry insert) Empty
@@ -113,5 +118,31 @@ elem r (Child bb l) =
         Nothing -> False
         Just _ -> any (RTree.elem r) l
         
+
+draw :: Show a => Int -> RTree a -> String
+draw h Empty = replicate h ' ' ++ "()\n"
+draw h t@(Leaf bb v)  = (replicate h ' ') ++ "(Leaf " ++ show bb ++ "," ++ show v ++ " )\n"
+draw h t@(Child bb l)  = replicate h ' ' ++ "(Child " ++ show bb ++ ", mse=" ++ (show $ mse1 t) ++ ")\n" ++ concatMap (draw (h+2)) l
+
+
+
+count :: RTree a -> Int
+count Empty = 0
+count (Leaf _ _) = 1
+count (Child _ l) = sum $ map count l
+
+
+
+mse1 :: RTree a -> Double 
+mse1 Empty = 0
+mse1 (Leaf _ _) = 0
+mse1 tree@(Child _ l) = mse
+    where 
+        mse :: Double
+        mse  = sum [ (square (m - (fromIntegral $ count li))) | li <- l] / (fromIntegral $ length l)
+        m :: Double
+        m    = (fromIntegral $ count tree) / (fromIntegral $ length l)
+        square x = x * x
+          
 
 
