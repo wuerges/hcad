@@ -42,7 +42,7 @@ mbrs2 pre r (p:ost) =
 select :: [RTree a] -> [RTree a] -> Rectangle -> Rectangle -> [RTree a] -> ([RTree a], [RTree a])
 select l1 l2 _ _ [] = (l1, l2)
 select l1 l2 r1 r2 (l:ls) = 
-    if mbr' l `mbr` r1 < mbr' l `mbr` r2 
+    if areaR (mbr' l `mbr` r1) < areaR (mbr' l `mbr` r2)
         then select (l:l1) l2 r1 r2 ls
         else select l1 (l:l2) r1 r2 ls
 
@@ -91,7 +91,7 @@ insertNodeP r v (Child bb l) =
 
     where 
         -- selects the child that will have the smallest rectangle
-        h : hs = sortOn (\x -> r `mbr` mbr' x) l 
+        h : hs = sortOn (\x -> areaR $ r `mbr` mbr' x) l 
 
 
 insert :: Rectangle -> a -> RTree a -> RTree a
